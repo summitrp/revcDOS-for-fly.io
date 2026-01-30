@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 """
 reVCDOS Server - Render.com Deployment Version
-This version is for deployment platforms, NOT for Colab
+Memory-safe packed file download
 """
 
 import subprocess
 import os
 import sys
+import requests
 
 # Get PORT from environment variable
 PORT = int(os.environ.get('PORT', 8000))
+
+PACKED_URL = "https://folder.morgen.qzz.io/revcdos.bin"
+PACKED_FILE = "revcdos.bin"
 
 print("=" * 60)
 print("🎮 reVCDOS Server - Deployment Mode")
@@ -44,16 +48,29 @@ if result.returncode != 0:
 else:
     print("✅ Dependencies installed")
 
-# Set PORT environment variable for the actual server
+# Download packed file safely if it doesn't exist
+if not os.path.exists(PACKED_FILE):
+    print(f"📥 Downloading packed file from {PACKED_URL}...")
+    with requests.get(PACKED_URL, stream=True) as r:
+        r.raise_for_status()
+        with open(PACKED_FILE, "wb") as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+    print(f"✅ Packed file downloaded: {PACKED_FILE}")
+else:
+    print(f"✅ Packed file already exists: {PACKED_FILE}")
+
+# Set PORT environment variable for the server
 os.environ['PORT'] = str(PORT)
 
-# Start the server (without localtunnel, without IPython stuff)
+# Start the server
 print(f"🚀 Starting server on port {PORT}...")
 print("=" * 60)
 
-# Run server directly with output visible
+# Run server directly, using the already downloaded packed file
 result = subprocess.run(
-    [sys.executable, "server.py", "--packed", "https://folder.morgen.qzz.io/revcdos.bin"],
+    [sys.executable, "server.py", "--packed", PACKED_FILE],
     env=os.environ
 )
 
