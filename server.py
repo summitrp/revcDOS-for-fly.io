@@ -5,7 +5,7 @@ import sys
 import os
 from IPython.display import clear_output, display, HTML
 
-PORT = 8000
+PORT = 4000
 LOCAL_URL = f"http://localhost:{PORT}"
 
 # Clone repo
