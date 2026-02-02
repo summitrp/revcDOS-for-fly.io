@@ -1,8 +1,2 @@
-fastapi
-httpx
-uvicorn
-brotli
-python-multipart
-aiofiles
-ipython
 requests
+flask
